@@ -1,0 +1,285 @@
+🤖 Advanced Telegram Bot: Policy & Language Management
+🚀 A Developer's Journey: Building a Seamless User Onboarding Experience
+This project represents a significant step in my journey to engineer robust and user-centric Telegram bot solutions. It's more than just a bot; it's a meticulously designed gateway ensuring privacy, clarity, and an exceptional first interaction for every user. Crafting this system provided invaluable insights into scalable bot architecture, secure data handling, and the intricacies of delivering truly global, localized experiences. The excitement lies in seeing how foundational principles of software engineering translate into a tangible, responsive, and welcoming digital interface.
+
+✨ Core Features & Architectural Design
+This bot acts as an intelligent, pre-main-bot module, meticulously designed to manage initial user interactions with an emphasis on transparency and user consent.
+
+Robust Policy Acceptance Framework:
+
+Engineered for Clarity: A structured, guided process for users to review and explicitly accept terms and privacy policies.
+
+Immutable Consent Logging: Precise timestamping and recording of policy acceptance in the database, ensuring verifiable consent.
+
+On-Demand Review: Seamless mechanism for users to revisit and review previously accepted policies at any point.
+
+Dynamic Multilingual Support System:
+
+Adaptive Localization: Users can intuitively select and switch the bot's interface language.
+
+Extensible Translation Layer: Easy integration of new languages via a centralized, human-editable JSON configuration, ensuring future scalability and maintainability.
+
+Intelligent Message Lifecycle Management:
+
+Chat Hygiene Automation: Automatic removal of irrelevant user text messages to maintain a clean and focused conversation flow.
+
+Optimized UI Persistence: Ensures menu stability and coherence by programmatically editing existing bot messages rather than sending new, redundant ones, reducing chat clutter and improving user experience.
+
+Seamless Main Bot Integration:
+
+Direct Access Provision: Upon successful policy acceptance, users are seamlessly transitioned to your primary bot application via a configurable deep link.
+
+Persistent User State Management:
+
+Database-Driven State: Secure storage and retrieval of critical user data, including preferred language, policy acceptance status, and the last bot message ID, leveraging MySQL for reliability and persistence.
+
+Secure & Streamlined Configuration:
+
+Environment Variable Best Practices: Utilizes environment variables (via .htaccess for Apache) for secure and flexible management of sensitive credentials like bot tokens and database access details.
+
+Enhanced Operational Visibility: Incorporates advanced logging for critical API interactions, facilitating efficient debugging and comprehensive performance monitoring.
+
+⚙️ Technical Prerequisites & Environment Setup
+To deploy and operate this bot successfully, ensure your hosting environment meets the following technical specifications:
+
+Web Server:
+
+Apache HTTP Server: Requires mod_rewrite module enabled and full support for .htaccess files.
+
+Nginx: Must be configured with appropriate fastcgi_pass directives for PHP-FPM and rewrite rules to correctly route webhook requests.
+
+PHP:
+
+PHP Version: 7.4 or higher.
+
+Required Extensions: php-curl (for Telegram Bot API communication) and php-mysqli (for MySQL database connectivity).
+
+Database System:
+
+MySQL or MariaDB: Version 5.7 or later is highly recommended for optimal performance and feature compatibility.
+
+A dedicated database user with adequate permissions for database creation, table management, and data manipulation is essential.
+
+Telegram Bot API Token:
+
+Obtain a valid Telegram Bot Token from @BotFather. This token is critical for authenticating your bot with the Telegram API.
+
+Domain & Hosting:
+
+A valid domain name with an active SSL certificate (HTTPS) is mandatory. Telegram webhooks strictly require secure connections.
+
+Access via FTP/SFTP or SSH for file upload, configuration, and maintenance.
+
+🚀 Deployment & Installation Guide
+Follow these meticulously detailed steps to get your Telegram bot up and running on your server.
+
+1. Project File Upload
+Upload all primary bot files (webhook.php, db.php, lang.php, languages.json, and .htaccess) to the root directory of your website (e.g., public_html or www).
+
+2. MySQL Database Configuration
+Database Creation: Access your database management panel (e.g., phpMyAdmin, cPanel database tools) and create a new database. A suggested name is telegram_bot_db.
+
+User Table Schema Deployment: Execute the following SQL query to create the essential users table. This table is meticulously designed to store all pertinent user data and their policy acceptance status.
+
+CREATE DATABASE IF NOT EXISTS `telegram_bot_db`
+CHARACTER SET utf8mb4 COLLATE utf8mb4_persian_ci; -- Ensuring full Persian language support
+
+USE `telegram_bot_db`;
+
+CREATE TABLE IF NOT EXISTS `users` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `telegram_user_id` BIGINT UNIQUE NOT NULL,
+    `language_code` VARCHAR(10) DEFAULT 'en' NOT NULL,
+    `terms_status` ENUM('initial', 'read_rules', 'accepted') DEFAULT 'initial' NOT NULL,
+    `accepted_at` DATETIME NULL,
+    `last_bot_message_id` INT NULL,
+    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_persian_ci;
+
+Field Definitions:
+
+id: Unique identifier for each user record.
+
+telegram_user_id: Unique Telegram user ID.
+
+language_code: Preferred language code (e.g., en, fa).
+
+terms_status: Current policy acceptance state (initial, read_rules, accepted).
+
+accepted_at: Timestamp of final policy acceptance.
+
+last_bot_message_id: ID of the last bot message in the user's chat (for efficient editing/deletion).
+
+3. Environment Variable Configuration (.htaccess)
+The .htaccess file, located in your website's root directory, is pivotal for securely managing the bot's critical environment variables and file access rules. Open this file with a text editor and meticulously replace the placeholder values within quotes:
+
+BOT_TOKEN: Replace with your Telegram Bot Token.
+
+DB_HOST: Your database host (commonly localhost).
+
+DB_USER: Your database username.
+
+DB_PASS: Your database password.
+
+DB_NAME: The name of the database you created in Step 2.
+
+NEXT_BOT_LINK: The complete deep link to your main/next bot (e.g., https://t.me/YourMainBotUsername). This link is presented to the user upon successful policy acceptance.
+
+# .htaccess
+
+# Configure PHP Environment Variables for Secure Credential Management
+SetEnv BOT_TOKEN "YOUR_TELEGRAM_BOT_TOKEN_HERE"
+SetEnv DB_HOST "your_database_host_here"
+SetEnv DB_USER "your_database_username_here"
+SetEnv DB_PASS "your_database_password_here"
+SetEnv DB_NAME "your_database_name_here"
+SetEnv NEXT_BOT_LINK "https://t.me/YourMainBotUsername"
+
+# Restrict Direct HTTP Access to Sensitive PHP and JSON Files for Enhanced Security
+<FilesMatch "\.(php|json)$">
+    Require all denied
+</FilesMatch>
+
+# Grant Explicit HTTP Access to webhook.php, the Bot's Primary Entry Point
+<Files webhook.php>
+    Require all granted
+</FilesMatch>
+
+# Optional: Enable Rewrite Rules for Cleaner URLs (Uncomment if needed)
+# RewriteEngine On
+# RewriteRule ^(.*)$ webhook.php [L]
+
+Security Note: While using .htaccess for environment variables is a secure practice for Apache servers, if your server environment differs (e.g., Nginx), you might need to define these variables in your server's configuration file (e.g., nginx.conf) or via a more advanced PHP-FPM setup. Direct hardcoding in PHP files is generally discouraged for security reasons.
+
+4. Telegram Webhook Configuration
+To enable Telegram to send updates to your bot, you must configure a webhook. Your webhook URL should be structured as https://yourdomain.com/webhook.php.
+
+You can establish this webhook by navigating to the following URL in your web browser or by executing a curl command:
+
+https://api.telegram.org/bot<YOUR_BOT_TOKEN>/setWebhook?url=https://yourdomain.com/webhook.php
+
+Example:
+https://api.telegram.org/bot1234567890:ABC-DEF1234ghIkl-799-j-kL/setWebhook?url=https://mybot.com/webhook.php
+
+A successful configuration will return a response similar to: {"ok":true,"result":true,"description":"Webhook was set"}.
+
+5. Language Configuration (languages.json)
+The languages.json file is the central repository for all bot text translations. You are empowered to modify existing translations or seamlessly integrate new languages by adhering to the specified JSON structure:
+
+{
+  "en": {
+    "welcome_message": "...",
+    "button_accept_rules": "...",
+    "button_change_language": "...",
+    "button_back_to_accepted_menu": "⬅️ Back to Accepted Rules Menu",
+    "rules_accepted_message": "...",
+    "proceed_message": "...",
+    "button_proceed_to_next_bot": "...",
+    "button_review_accepted_rules": "...",
+    "error_not_accepted": "...",
+    "status_initial": "...",
+    "status_read_rules": "...",
+    "status_accepted": "...",
+    "message_deleted": "...",
+    "select_language_prompt": "...",
+    "language_changed": "..."
+  },
+  "fa": {
+    "welcome_message": "...",
+    "button_accept_rules": "...",
+    "button_change_language": "...",
+    "button_back_to_accepted_menu": "⬅️ بازگشت به منوی قوانین پذیرفته شده",
+    "rules_accepted_message": "...",
+    "proceed_message": "...",
+    "button_proceed_to_next_bot": "...",
+    "button_review_accepted_rules": "...",
+    "error_not_accepted": "...",
+    "status_initial": "...",
+    "status_read_rules": "...",
+    "status_accepted": "...",
+    "message_deleted": "...",
+    "select_language_prompt": "...",
+    "language_changed": "..."
+  }
+  // Extend this structure to include additional languages as needed.
+}
+
+🕹️ User Interaction Flow
+The bot's interaction model is designed for simplicity and intuitiveness, primarily leveraging inline buttons and straightforward commands:
+
+/start:
+
+Initiates the bot, presenting a welcoming message, community guidelines, and initial interactive buttons (policy acceptance, language selection).
+
+✅ Accept & Understand Rules:
+
+Upon interaction, the user's consent is recorded, and they are transitioned to the final "Accepted Policies" menu, complete with an acceptance timestamp.
+
+🌐 Change Language:
+
+Displays a dynamic menu of supported languages, allowing users to select their preferred interface language.
+
+Upon selection, the bot's language is updated, and the user is redirected back to the appropriate main menu (either the initial policy menu if not yet accepted, or the final accepted menu).
+
+📖 Review Accepted Rules:
+
+Available in the final menu, this button navigates the user back to the detailed policy display for review.
+
+⬅️ Back to Accepted Rules Menu:
+
+Found within the policy review interface, this button provides a direct return path to the main "Accepted Policies" menu, maintaining navigational consistency.
+
+➡️ Access Main Bot Now:
+
+This button in the final menu serves as the primary conduit, directing users to the configured deep link of your core bot application.
+
+Unhandled Text Messages:
+
+Any extraneous text messages sent by the user (other than /start) are automatically cleared from the chat to ensure a clean and focused conversational environment.
+
+📂 Project Architecture & File Structure
+The project adheres to a modular and well-organized file structure, designed for ease of maintenance, scalability, and collaborative development:
+
+.
+├── webhook.php         # The bot's primary entry point; handles all incoming Telegram updates and dispatches logic.
+├── db.php              # Dedicated module for database interactions (connection, user data read/write/update operations).
+├── lang.php            # Multilingual support system; manages loading and retrieval of localized text strings.
+├── languages.json      # Centralized JSON configuration file containing all translated text strings for supported languages.
+└── .htaccess           # Apache server configuration file; manages environment variables and file access/URL rewrite rules.
+
+🧠 Developer's Reflection & Learnings
+Developing this bot has been an immensely rewarding experience, offering profound insights into designing robust, user-centric backend systems. Key learnings include:
+
+State Management in Stateless Environments: Successfully managing user state (language, policy acceptance) across multiple, stateless webhook calls proved to be a foundational challenge, expertly addressed through a persistent database layer.
+
+Dynamic UI with Inline Keyboards: Mastering the art of updating and manipulating Telegram's inline keyboards to create fluid, responsive menus without spamming the chat with new messages was crucial for an optimal user experience.
+
+Internationalization Best Practices: Implementing a flexible multilingual system using a JSON-based translation file significantly simplified content management and allowed for rapid expansion into new languages.
+
+Secure Credential Handling: Reinforcing the importance of environment variables for sensitive data (API tokens, database credentials) to maintain security and portability across different deployment environments.
+
+Robust Error Logging: Integrating comprehensive error logging has been invaluable for quickly identifying and diagnosing issues, ensuring the bot's reliability and stability in a production environment.
+
+This project underscores the power of modular design and meticulous state management in building resilient and user-friendly bot applications.
+
+🤝 Contribution Guidelines
+Your contributions are highly valued and can significantly enhance this project! If you have ideas for new features, code improvements, or bug fixes, please consider:
+
+Forking this repository on GitHub.
+
+Creating a new Branch for your feature/fix: git checkout -b feature/your-feature-name or bugfix/your-bug-name.
+
+Implementing your changes and committing them with clear, descriptive messages.
+
+Pushing your changes to your new branch.
+
+Opening a Pull Request (PR) to the main repository.
+
+Please provide a detailed and concise description for your Pull Request.
+
+📄 License
+This project is open-source and distributed under the MIT License.
+
+💖 Acknowledgements & Support
+Thank you for your interest in and support of this project! If you find this bot valuable, please consider giving it a star on GitHub and sharing it with others. Your engagement fuels continued development.
