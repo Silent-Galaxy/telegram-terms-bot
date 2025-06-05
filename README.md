@@ -1,3 +1,16 @@
+![image](https://github.com/user-attachments/assets/e321e8ff-18c7-4e81-803b-a0c8a70ff65b)
+![image](https://github.com/user-attachments/assets/c27f5918-4858-4e91-a4db-bb1280bfd970)
+![image](https://github.com/user-attachments/assets/37ba6abc-60cb-4930-b5be-59417e3844f3)
+![image](https://github.com/user-attachments/assets/18392a0b-5e37-4e94-99b1-a4a15bfe9a2f)
+![image](https://github.com/user-attachments/assets/17191814-5ca8-4548-9f65-b48410c8c88f)
+![image](https://github.com/user-attachments/assets/5032370a-02a8-4aaf-874a-2487b1a29592)
+
+
+
+
+
+
+
 # telegram-terms-bot
 https://t.me/addmember_menu_0_bot
 🤖 ربات تلگرام: مدیریت قوانین و زبان پیشرفته
