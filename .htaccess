@@ -1,0 +1,31 @@
+# .htaccess
+
+# تنظیم متغیرهای محیطی برای PHP
+# این متغیرها توسط تابع getenv() در فایل های PHP خوانده می شوند.
+# مقادیر داخل دابل کوتیشن را با اطلاعات واقعی خود جایگزین کنید.
+SetEnv BOT_TOKEN "YOUR_TELEGRAM_BOT_TOKEN"
+SetEnv DB_HOST "your_database_host"
+SetEnv DB_USER "your_database_username"
+SetEnv DB_PASS "your_database_password"
+SetEnv DB_NAME "your_database_name"
+SetEnv NEXT_BOT_LINK "https://t.me/addmember_menu_1_bot" # لینک ثابت به ربات اصلی شما
+
+# از دسترسی مستقیم به فایل‌های PHP و JSON جلوگیری می‌کند
+# این بلاک دسترسی HTTP مستقیم به تمام فایل‌هایی که نام آن‌ها به .php یا .json ختم می‌شود را مسدود می‌کند.
+# این یک اقدام امنیتی حیاتی برای محافظت از کد منبع و اطلاعات حساس شماست.
+<FilesMatch "\.(php|json)$">
+    Require all denied
+</FilesMatch>
+
+# اجازه دسترسی به webhook.php را می‌دهد
+# این بلاک به طور خاص به فایل webhook.php اجازه دسترسی HTTP را می‌دهد.
+# این فایل نقطه ورودی اصلی ربات شما برای دریافت به‌روزرسانی‌ها از تلگرام است و باید قابل دسترسی باشد.
+<Files webhook.php>
+    Require all granted
+</FilesMatch>
+
+# اگر می‌خواهید URL های تمیزتری داشته باشید (مثلاً yourdomain.com/bot به جای yourdomain.com/webhook.php)،
+# می‌توانید خطوط زیر را از حالت کامنت خارج کرده و مسیردهی را تنظیم کنید.
+# برای عملکرد فعلی ربات، نیازی به فعال کردن آن‌ها نیست.
+# RewriteEngine On
+# RewriteRule ^(.*)$ webhook.php [L]
